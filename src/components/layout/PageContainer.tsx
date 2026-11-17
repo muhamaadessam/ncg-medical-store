@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export function PageContainer({ children }: { children: ReactNode }) {
-  return <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-10">{children}</main>;
+  return <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:py-10">{children}</main>;
 }
 
 export function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {

@@ -60,6 +60,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -110,6 +112,9 @@
   --sidebar-accent-foreground: oklch(0.42 0.09 200);
   --sidebar-border: oklch(0.925 0.012 220);
   --sidebar-ring: oklch(0.58 0.11 195);
+  --highlight: oklch(0.6 0.13 158);
+  --highlight-foreground: oklch(0.99 0.01 158);
+  --shadow-lift: 0 2px 4px oklch(0.3 0.05 230 / 0.06), 0 16px 32px -12px oklch(0.45 0.08 210 / 0.28);
   --shadow-soft: 0 1px 2px oklch(0.3 0.05 230 / 0.06), 0 6px 20px -8px oklch(0.45 0.08 210 / 0.18);
 }
 
@@ -163,4 +168,16 @@
 
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-lift {
+  box-shadow: var(--shadow-lift);
+}
+
+/* Hide the scrollbar on horizontally scrolling chip rows while keeping them scrollable. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
