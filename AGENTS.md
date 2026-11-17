@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Money: all price math uses integer fils via `src/lib/money.ts` (`toFils`, `formatKWD`); never do arithmetic on KWD floats. Why: KWD has 3 decimals and floats drift.
+- Pricing tiers are independent bundle offers; `bundle_price` is the bundle total, and a product may have any number of tiers. Why: core business rule of the store.
+- Structure: feature code in `src/features/{catalog,cart,admin}`, page components in `src/pages` (plain components, not routes), thin TanStack route files in `src/routes` that set `head()`, prime data in the loader and render a page. Why: the brief's folder layout while keeping TanStack file routing.
+- Data: each catalog read is a `queryOptions` factory in `src/features/catalog/api/queries.ts`; loaders call `ensureQueryData`, components use the `useSuspenseQuery` hooks. Why: SSR-safe cache priming.
+- DB types: `src/types` re-exports row types from the generated `src/integrations/supabase/types.ts`. Why: one source of truth.
+- Demo security: catalog tables and the `product-images` bucket have public read/write policies because auth is out of scope. Why: assessment demo only.
