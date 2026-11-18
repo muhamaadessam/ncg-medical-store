@@ -25,11 +25,12 @@ export function packsLabel(units: number): string {
 export function findBestValueTierId(
   tiers: ReadonlyArray<TierPrice & Pick<PricingTier, "id">>,
 ): string | null {
-  if (tiers.length < 2) return null;
+  const [first, ...rest] = tiers;
+  if (!first || rest.length === 0) return null;
 
-  let best = tiers[0];
+  let best = first;
   let bestFils = toFils(best.bundle_price);
-  for (const tier of tiers.slice(1)) {
+  for (const tier of rest) {
     const fils = toFils(tier.bundle_price);
     if (fils * best.units_per_bundle < bestFils * tier.units_per_bundle) {
       best = tier;

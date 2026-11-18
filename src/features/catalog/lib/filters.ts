@@ -9,8 +9,8 @@ export type CatalogSearch = {
 export function parseCatalogSearch(search: Record<string, unknown>): CatalogSearch {
   const pick = (value: unknown) =>
     typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
-  const brand = pick(search.brand);
-  const category = pick(search.category);
+  const brand = pick(search["brand"]);
+  const category = pick(search["category"]);
   return {
     ...(brand ? { brand } : {}),
     ...(category ? { category } : {}),

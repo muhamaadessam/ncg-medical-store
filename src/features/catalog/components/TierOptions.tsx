@@ -24,7 +24,7 @@ export function TierOptions({
   onSelect,
 }: TierOptionsProps) {
   return (
-    <fieldset className="space-y-2">
+    <fieldset className="space-y-2.5 pt-1">
       <legend className="sr-only">Choose a bundle for {productName}</legend>
       {tiers.map((tier) => {
         const { bundleFils, perPackFils } = tierPricing(tier);
@@ -59,18 +59,26 @@ export function TierOptions({
               {selected ? <span className="size-2 rounded-full bg-primary" /> : null}
             </span>
 
+            {tier.id === bestValueId ? (
+              <Badge variant="highlight" className="absolute -top-2 right-3 shadow-soft">
+                Best value
+              </Badge>
+            ) : null}
+
             <span className="min-w-0 flex-1">
-              <span className="flex flex-wrap items-center gap-1.5">
-                <span className="text-sm font-medium text-foreground">{tier.label}</span>
-                {tier.id === bestValueId ? <Badge variant="highlight">Best value</Badge> : null}
-              </span>
+              <span className="block text-sm font-medium text-foreground">{tier.label}</span>
               <span className="block text-xs text-muted-foreground">
-                {packsLabel(tier.units_per_bundle)} · {formatKWD(perPackFils)} / pack
+                {packsLabel(tier.units_per_bundle)}
               </span>
             </span>
 
-            <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-              {formatKWD(bundleFils)}
+            <span className="shrink-0 text-right">
+              <span className="block text-sm font-semibold tabular-nums text-foreground">
+                {formatKWD(bundleFils)}
+              </span>
+              <span className="block whitespace-nowrap text-[11px] tabular-nums text-muted-foreground">
+                {formatKWD(perPackFils)} / pack
+              </span>
             </span>
           </label>
         );

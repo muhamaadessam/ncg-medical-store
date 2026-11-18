@@ -5,8 +5,9 @@ import { routeTree } from "./routeTree.gen";
 export const getRouter = () => {
   // One client per request: a module-level QueryClient leaks cached data between SSR requests.
   const queryClient = new QueryClient({
-    // One retry keeps a flaky request from erroring while still surfacing real failures quickly.
-    defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
+    // The database client already retries failed reads, so Query does not retry on top of it;
+    // otherwise an outage takes ~15s to reach the error screen.
+    defaultOptions: { queries: { retry: 0, staleTime: 30_000 } },
   });
 
   const router = createRouter({

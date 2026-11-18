@@ -4,7 +4,7 @@ import { Cross, ShoppingCart } from "lucide-react";
 import { useCartItemCount } from "@/features/cart";
 
 const navLinkClass =
-  "rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground";
+  "rounded-full px-2 py-1.5 text-sm sm:px-3 font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground";
 const navLinkActiveClass = "bg-accent text-accent-foreground";
 
 export function AppHeader() {
@@ -12,9 +12,9 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4">
         <Link to="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-soft">
+          <span className="flex size-8 items-center justify-center rounded-xl sm:size-9 bg-primary text-primary-foreground shadow-soft">
             <Cross className="size-5" strokeWidth={2.5} />
           </span>
           <span className="font-display whitespace-nowrap text-base font-semibold tracking-tight text-foreground sm:text-lg">
@@ -22,7 +22,7 @@ export function AppHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1" aria-label="Main">
+        <nav className="flex items-center sm:gap-1" aria-label="Main">
           <Link
             to="/"
             className={navLinkClass}

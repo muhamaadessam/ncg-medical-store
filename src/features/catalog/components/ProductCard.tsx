@@ -67,12 +67,12 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
           </h3>
         </div>
 
-        {tiers.length === 0 ? (
+        {!selectedTier ? (
           <p className="rounded-xl bg-muted px-3 py-3 text-sm text-muted-foreground">
             Currently unavailable
           </p>
         ) : tiers.length === 1 ? (
-          <SingleTierPrice tier={tiers[0]} />
+          <SingleTierPrice tier={selectedTier} />
         ) : (
           <TierOptions
             productId={product.id}

@@ -34,6 +34,9 @@ use the editor.
 - Money: all price math uses integer fils via `src/lib/money.ts` (`toFils`, `formatKWD`); never do arithmetic on KWD floats. Why: KWD has 3 decimals and floats drift.
 - Pricing tiers are independent bundle offers; `bundle_price` is the bundle total, and a product may have any number of tiers. Why: core business rule of the store.
 - Structure: feature code in `src/features/{catalog,cart,admin}`, page components in `src/pages` (plain components, not routes), thin TanStack route files in `src/routes` that set `head()`, prime data in the loader and render a page. Why: the brief's folder layout while keeping TanStack file routing.
-- Data: each catalog read is a `queryOptions` factory in `src/features/catalog/api/queries.ts`; loaders call `ensureQueryData`, components use the `useSuspenseQuery` hooks. Why: SSR-safe cache priming.
+- Data: each catalog read is a `queryOptions` factory in `src/features/catalog/api/queries.ts`; loaders call `ensureQueryData`, components use the `useSuspenseQuery` hooks; route `pendingComponent`/`errorComponent` own loading and error UI. Why: SSR-safe cache priming.
+- Storefront filters: validated from the URL query string (`parseCatalogSearch`), applied client-side to the full product list with faceted counts (`src/features/catalog/lib/filters.ts`). Why: instant filtering and counts from one request at catalog size.
+- Pricing display logic (per-pack price, best value) lives in `src/features/catalog/lib/pricing.ts` and compares tiers by integer cross-multiplication. Why: no float rounding in comparisons.
+- Query retries are off; the database client already retries failed reads. Why: avoids a ~15s wait before the error screen.
 - DB types: `src/types` re-exports row types from the generated `src/integrations/supabase/types.ts`. Why: one source of truth.
 - Demo security: catalog tables and the `product-images` bucket have public read/write policies because auth is out of scope. Why: assessment demo only.

@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,17 @@ type CatalogFiltersProps = {
 const hasFilters = (search: CatalogSearch) => Boolean(search.brand || search.category);
 
 export function ClearFiltersButton({ className }: { className?: string }) {
+  const navigate = useNavigate();
   return (
-    <Button asChild variant="outline" size="sm" className={cn("rounded-full", className)}>
-      <Link to="/" search={{}}>
-        <X />
-        Clear filters
-      </Link>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className={cn("rounded-full", className)}
+      onClick={() => void navigate({ to: "/", search: {}, resetScroll: false })}
+    >
+      <X />
+      Clear filters
     </Button>
   );
 }
@@ -103,21 +108,28 @@ function FacetLink({
   search: CatalogSearch;
   variant: "row" | "chip";
 }) {
+  const navigate = useNavigate();
   const active = search[group.key] === id;
   return (
-    <Link
-      to="/"
-      search={(prev) => ({ ...prev, [group.key]: id })}
-      replace
-      resetScroll={false}
-      aria-current={active ? "true" : undefined}
+    <button
+      type="button"
+      aria-pressed={active}
+      // Writes the filter to the query string (?brand=&category=) so it survives refresh and can be shared.
+      onClick={() =>
+        void navigate({
+          to: "/",
+          search: (prev) => ({ ...prev, [group.key]: id }),
+          resetScroll: false,
+        })
+      }
       className={cn(
-        "flex items-center justify-between gap-2 text-sm transition-colors",
+        "w-full cursor-pointer text-left",
+        "flex items-center justify-between gap-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         variant === "row" &&
           "rounded-lg px-3 py-2 text-foreground hover:bg-muted",
         variant === "row" && active && "bg-accent font-medium text-accent-foreground hover:bg-accent",
         variant === "chip" &&
-          "shrink-0 rounded-full border bg-card px-3 py-1.5 text-foreground hover:border-primary/50",
+          "w-auto shrink-0 rounded-full border bg-card px-3 py-1.5 text-foreground hover:border-primary/50",
         variant === "chip" && active && "border-primary bg-primary text-primary-foreground hover:border-primary",
       )}
     >
@@ -134,6 +146,6 @@ function FacetLink({
       >
         {count}
       </span>
-    </Link>
+    </button>
   );
 }
