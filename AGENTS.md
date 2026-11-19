@@ -39,4 +39,4 @@ use the editor.
 - Pricing display logic (per-pack price, best value) lives in `src/features/catalog/lib/pricing.ts` and compares tiers by integer cross-multiplication. Why: no float rounding in comparisons.
 - Query retries are off; the database client already retries failed reads. Why: avoids a ~15s wait before the error screen.
 - DB types: `src/types` re-exports row types from the generated `src/integrations/supabase/types.ts`. Why: one source of truth.
-- Demo security: catalog tables and the `product-images` bucket have public read/write policies because auth is out of scope. Why: assessment demo only.
+- Access: catalog tables are publicly readable; all catalog writes and every `product-images` storage operation require `public.has_role(auth.uid(), 'admin')` (roles live in `public.user_roles`). Bucket is private, so storefront display of uploaded images must use server-issued signed URLs. Why: closes open write/delete access flagged by the security scan.
