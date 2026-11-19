@@ -11,6 +11,21 @@ export function tierPricing(tier: TierPrice) {
   return { bundleFils, perPackFils };
 }
 
+/**
+ * Order line for N bundles of one tier, in integer fils.
+ * total = bundle_price × bundles (never × packs); totalPacks = units_per_bundle × bundles.
+ */
+export function bundleSummary(tier: TierPrice, bundles: number) {
+  if (!Number.isInteger(bundles) || bundles < 1) {
+    throw new Error(`bundles must be a positive integer, got ${bundles}`);
+  }
+  const { bundleFils } = tierPricing(tier);
+  return {
+    totalFils: bundleFils * bundles,
+    totalPacks: tier.units_per_bundle * bundles,
+  };
+}
+
 /** "1 pack" / "4 packs" */
 export function packsLabel(units: number): string {
   return `${units} ${units === 1 ? "pack" : "packs"}`;

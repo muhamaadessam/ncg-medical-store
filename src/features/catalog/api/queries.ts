@@ -8,6 +8,8 @@ export type ProductFilters = {
   categoryId?: string;
 };
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const PRODUCT_SELECT = "*, brand:brands(*), category:categories(*), pricing_tiers(*)";
 
 export const catalogKeys = {
@@ -44,6 +46,8 @@ export function productQueryOptions(id: string) {
   return queryOptions({
     queryKey: catalogKeys.product(id),
     queryFn: async (): Promise<ProductWithRelations | null> => {
+      // A malformed id can never match; answering "not found" avoids a database type error.
+      if (!UUID_RE.test(id)) return null;
       const { data, error } = await supabase
         .from("products")
         .select(PRODUCT_SELECT)

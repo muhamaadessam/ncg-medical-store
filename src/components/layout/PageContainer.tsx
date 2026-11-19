@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
-export function PageContainer({ children }: { children: ReactNode }) {
-  return <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:py-10">{children}</main>;
+import { cn } from "@/lib/utils";
+
+export function PageContainer({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <main className={cn("mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:py-10", className)}>{children}</main>
+  );
 }
 
 export function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {

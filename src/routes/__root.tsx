@@ -137,7 +137,8 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </div>
-      <Toaster position="bottom-center" closeButton />
+      {/* Mobile offset keeps toasts clear of the product page's sticky checkout bar. */}
+      <Toaster position="bottom-center" closeButton mobileOffset={{ bottom: 96 }} />
     </QueryClientProvider>
   );
 }

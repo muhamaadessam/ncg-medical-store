@@ -7,9 +7,10 @@ export function useCartItemCount(): number {
 }
 
 /**
- * Placeholder: adds ONE bundle of the given pricing tier to the cart.
+ * Placeholder: adds `bundles` bundles (default 1) of the given pricing tier to the cart.
  * The real cart store replaces this in a later step.
  */
-export function addToCart(tierId: string): void {
+export function addToCart(tierId: string, bundles = 1): void {
   void tierId;
+  void bundles;
 }
