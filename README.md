@@ -2,8 +2,8 @@
 
 Technical assessment for **National Care Group** (Vibe Coder task).
 
-- **Live app:** `<LIVE_LINK>`
-- **Admin panel:** `<LIVE_LINK>/admin` (open to anyone: authentication is out of scope)
+- **Live app:** https://ncg-medical-store.lovable.app
+- **Admin panel:** https://ncg-medical-store.lovable.app/admin (open to anyone: authentication is out of scope)
 - **Repository:** https://github.com/muhamaadessam/ncg-medical-store
 
 ## Features
