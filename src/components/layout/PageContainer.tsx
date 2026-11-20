@@ -2,9 +2,17 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export function PageContainer({ children, className }: { children: ReactNode; className?: string }) {
+export function PageContainer({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <main className={cn("mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:py-10", className)}>{children}</main>
+    <main className={cn("mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:py-10", className)}>
+      {children}
+    </main>
   );
 }
 

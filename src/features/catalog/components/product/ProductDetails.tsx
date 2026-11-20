@@ -76,7 +76,10 @@ export function ProductDetails({ product }: { product: ProductWithRelations }) {
                 to="/"
                 search={{ brand: product.brand.id }}
                 title={`All ${product.brand.name} products`}
-                className={cn(badgeVariants({ variant: "soft" }), "py-1 hover:bg-primary hover:text-primary-foreground")}
+                className={cn(
+                  badgeVariants({ variant: "soft" }),
+                  "py-1 hover:bg-primary hover:text-primary-foreground",
+                )}
               >
                 {product.brand.name}
               </Link>
@@ -84,7 +87,10 @@ export function ProductDetails({ product }: { product: ProductWithRelations }) {
                 to="/"
                 search={{ category: product.category.id }}
                 title={`All ${product.category.name} products`}
-                className={cn(badgeVariants({ variant: "muted" }), "py-1 hover:bg-primary hover:text-primary-foreground")}
+                className={cn(
+                  badgeVariants({ variant: "muted" }),
+                  "py-1 hover:bg-primary hover:text-primary-foreground",
+                )}
               >
                 {product.category.name}
               </Link>
@@ -93,7 +99,9 @@ export function ProductDetails({ product }: { product: ProductWithRelations }) {
               {product.name}
             </h1>
             {product.description ? (
-              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{product.description}</p>
+              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+                {product.description}
+              </p>
             ) : null}
           </header>
 
@@ -109,7 +117,12 @@ export function ProductDetails({ product }: { product: ProductWithRelations }) {
 
               <BundleStepper value={bundles} onChange={setBundles} />
 
-              <PriceSummary tier={selectedTier} bundles={bundles} summary={summary} onAdd={handleAdd} />
+              <PriceSummary
+                tier={selectedTier}
+                bundles={bundles}
+                summary={summary}
+                onAdd={handleAdd}
+              />
             </>
           ) : (
             <p className="rounded-2xl bg-muted px-4 py-4 text-sm text-muted-foreground">
@@ -120,7 +133,12 @@ export function ProductDetails({ product }: { product: ProductWithRelations }) {
       </div>
 
       {selectedTier && summary ? (
-        <MobileCheckoutBar totalFils={summary.totalFils} bundles={bundles} tier={selectedTier} onAdd={handleAdd} />
+        <MobileCheckoutBar
+          totalFils={summary.totalFils}
+          bundles={bundles}
+          tier={selectedTier}
+          onAdd={handleAdd}
+        />
       ) : null}
     </>
   );
@@ -140,7 +158,10 @@ function PriceSummary({
   onAdd: () => void;
 }) {
   return (
-    <section aria-labelledby="summary-heading" className="rounded-2xl border bg-card p-5 shadow-soft">
+    <section
+      aria-labelledby="summary-heading"
+      className="rounded-2xl border bg-card p-5 shadow-soft"
+    >
       <h2 id="summary-heading" className="sr-only">
         Price summary
       </h2>
@@ -162,7 +183,11 @@ function PriceSummary({
           </dd>
         </div>
       </dl>
-      <Button size="lg" className="mt-5 hidden h-12 w-full rounded-xl text-base lg:flex" onClick={onAdd}>
+      <Button
+        size="lg"
+        className="mt-5 hidden h-12 w-full rounded-xl text-base lg:flex"
+        onClick={onAdd}
+      >
         <ShoppingCart />
         Add to cart
       </Button>
@@ -188,7 +213,9 @@ function MobileCheckoutBar({
           <p className="truncate text-xs text-muted-foreground">
             {bundles} × {tier.label}
           </p>
-          <p className="font-display text-lg font-semibold tabular-nums text-foreground">{formatKWD(totalFils)}</p>
+          <p className="font-display text-lg font-semibold tabular-nums text-foreground">
+            {formatKWD(totalFils)}
+          </p>
         </div>
         <Button size="lg" className="h-11 shrink-0 rounded-xl" onClick={onAdd}>
           <ShoppingCart />

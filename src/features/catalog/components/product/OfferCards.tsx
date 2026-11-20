@@ -20,7 +20,13 @@ type OfferCardsProps = {
  * radio-group semantics and arrow-key navigation for free. A single tier is
  * shown as a plain offer, not a one-option selector.
  */
-export function OfferCards({ productId, tiers, selectedId, bestValueId, onSelect }: OfferCardsProps) {
+export function OfferCards({
+  productId,
+  tiers,
+  selectedId,
+  bestValueId,
+  onSelect,
+}: OfferCardsProps) {
   if (tiers.length === 1 && tiers[0]) {
     return (
       <section aria-labelledby="offer-heading" className="space-y-3">
@@ -56,7 +62,12 @@ export function OfferCards({ productId, tiers, selectedId, bestValueId, onSelect
                 onChange={() => onSelect(tier.id)}
                 className="sr-only"
               />
-              <OfferBody tier={tier} selected={selected} isBest={tier.id === bestValueId} interactive />
+              <OfferBody
+                tier={tier}
+                selected={selected}
+                isBest={tier.id === bestValueId}
+                interactive
+              />
             </label>
           );
         })}
@@ -94,7 +105,9 @@ function OfferBody({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-display text-base font-semibold text-foreground">{tier.label}</p>
-          <p className="text-sm text-muted-foreground">{packsLabel(tier.units_per_bundle)} per bundle</p>
+          <p className="text-sm text-muted-foreground">
+            {packsLabel(tier.units_per_bundle)} per bundle
+          </p>
         </div>
         {interactive ? (
           <span

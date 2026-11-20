@@ -25,16 +25,28 @@ export function correctBundlesInput(raw: string, current: number): BundlesInputR
   const keep = clampBundles(current);
 
   if (text === "") {
-    return { bundles: keep, draft: "", hint: `Enter a number from ${MIN_BUNDLES} to ${MAX_BUNDLES}` };
+    return {
+      bundles: keep,
+      draft: "",
+      hint: `Enter a number from ${MIN_BUNDLES} to ${MAX_BUNDLES}`,
+    };
   }
 
   if (/^\d+$/.test(text)) {
     const n = Number(text);
     if (n < MIN_BUNDLES) {
-      return { bundles: MIN_BUNDLES, draft: String(MIN_BUNDLES), hint: `Minimum is ${MIN_BUNDLES} bundle` };
+      return {
+        bundles: MIN_BUNDLES,
+        draft: String(MIN_BUNDLES),
+        hint: `Minimum is ${MIN_BUNDLES} bundle`,
+      };
     }
     if (n > MAX_BUNDLES) {
-      return { bundles: MAX_BUNDLES, draft: String(MAX_BUNDLES), hint: `Maximum is ${MAX_BUNDLES} bundles` };
+      return {
+        bundles: MAX_BUNDLES,
+        draft: String(MAX_BUNDLES),
+        hint: `Maximum is ${MAX_BUNDLES} bundles`,
+      };
     }
     return { bundles: n, draft: String(n), hint: null };
   }
@@ -42,7 +54,11 @@ export function correctBundlesInput(raw: string, current: number): BundlesInputR
   const numeric = Number(text.replace(",", "."));
   if (Number.isFinite(numeric)) {
     if (numeric < MIN_BUNDLES) {
-      return { bundles: MIN_BUNDLES, draft: String(MIN_BUNDLES), hint: `Minimum is ${MIN_BUNDLES} bundle` };
+      return {
+        bundles: MIN_BUNDLES,
+        draft: String(MIN_BUNDLES),
+        hint: `Minimum is ${MIN_BUNDLES} bundle`,
+      };
     }
     const fixed = clampBundles(numeric);
     return { bundles: fixed, draft: String(fixed), hint: "Whole bundles only" };

@@ -31,7 +31,11 @@ export function AppHeader() {
           >
             Home
           </Link>
-          <Link to="/admin" className={navLinkClass} activeProps={{ className: navLinkActiveClass }}>
+          <Link
+            to="/admin"
+            className={navLinkClass}
+            activeProps={{ className: navLinkActiveClass }}
+          >
             Admin
           </Link>
           <Link

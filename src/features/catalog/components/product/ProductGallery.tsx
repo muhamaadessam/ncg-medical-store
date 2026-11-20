@@ -38,7 +38,9 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
                 className={cn(
                   "block size-16 overflow-hidden rounded-xl border-2 bg-muted transition sm:size-20",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  i === index ? "border-primary" : "border-transparent opacity-70 hover:opacity-100",
+                  i === index
+                    ? "border-primary"
+                    : "border-transparent opacity-70 hover:opacity-100",
                 )}
               >
                 <img src={src} alt="" loading="lazy" className="size-full object-cover" />

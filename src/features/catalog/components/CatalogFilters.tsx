@@ -50,11 +50,25 @@ export function FilterSidebar({ search, groups }: CatalogFiltersProps) {
             </h2>
             <ul className="space-y-0.5">
               <li>
-                <FacetLink group={group} id={undefined} label="All" count={group.allCount} search={search} variant="row" />
+                <FacetLink
+                  group={group}
+                  id={undefined}
+                  label="All"
+                  count={group.allCount}
+                  search={search}
+                  variant="row"
+                />
               </li>
               {group.options.map((o) => (
                 <li key={o.id}>
-                  <FacetLink group={group} id={o.id} label={o.name} count={o.count} search={search} variant="row" />
+                  <FacetLink
+                    group={group}
+                    id={o.id}
+                    label={o.name}
+                    count={o.count}
+                    search={search}
+                    variant="row"
+                  />
                 </li>
               ))}
             </ul>
@@ -78,9 +92,24 @@ export function FilterChips({ search, groups }: CatalogFiltersProps) {
           <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {group.title}
           </span>
-          <FacetLink group={group} id={undefined} label="All" count={group.allCount} search={search} variant="chip" />
+          <FacetLink
+            group={group}
+            id={undefined}
+            label="All"
+            count={group.allCount}
+            search={search}
+            variant="chip"
+          />
           {group.options.map((o) => (
-            <FacetLink key={o.id} group={group} id={o.id} label={o.name} count={o.count} search={search} variant="chip" />
+            <FacetLink
+              key={o.id}
+              group={group}
+              id={o.id}
+              label={o.name}
+              count={o.count}
+              search={search}
+              variant="chip"
+            />
           ))}
         </div>
       ))}
@@ -125,12 +154,15 @@ function FacetLink({
       className={cn(
         "w-full cursor-pointer text-left",
         "flex items-center justify-between gap-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        variant === "row" && "rounded-lg px-3 py-2 text-foreground hover:bg-muted",
         variant === "row" &&
-          "rounded-lg px-3 py-2 text-foreground hover:bg-muted",
-        variant === "row" && active && "bg-accent font-medium text-accent-foreground hover:bg-accent",
+          active &&
+          "bg-accent font-medium text-accent-foreground hover:bg-accent",
         variant === "chip" &&
           "w-auto shrink-0 rounded-full border bg-card px-3 py-1.5 text-foreground hover:border-primary/50",
-        variant === "chip" && active && "border-primary bg-primary text-primary-foreground hover:border-primary",
+        variant === "chip" &&
+          active &&
+          "border-primary bg-primary text-primary-foreground hover:border-primary",
       )}
     >
       <span className="whitespace-nowrap">{label}</span>

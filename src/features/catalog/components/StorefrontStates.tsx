@@ -5,7 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { ClearFiltersButton } from "./CatalogFilters";
 
-export const PRODUCT_GRID_CLASS = "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4";
+export const PRODUCT_GRID_CLASS =
+  "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4";
 
 export function ProductCardSkeleton() {
   return (
@@ -55,11 +56,16 @@ export function StorefrontSkeleton() {
 
 export function StorefrontError({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center rounded-2xl border bg-card px-6 py-12 text-center shadow-soft" role="alert">
+    <div
+      className="mx-auto flex max-w-md flex-col items-center rounded-2xl border bg-card px-6 py-12 text-center shadow-soft"
+      role="alert"
+    >
       <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
         <TriangleAlert className="size-6" />
       </span>
-      <h2 className="font-display text-lg font-semibold text-foreground">We couldn't load the products</h2>
+      <h2 className="font-display text-lg font-semibold text-foreground">
+        We couldn't load the products
+      </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Please check your connection and try again.
       </p>
