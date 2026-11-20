@@ -163,6 +163,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      save_product_with_tiers: {
+        Args: { p_product: Json; p_tiers: Json }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
