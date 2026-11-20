@@ -40,3 +40,5 @@ use the editor.
 - Query retries are off; the database client already retries failed reads. Why: avoids a ~15s wait before the error screen.
 - DB types: `src/types` re-exports row types from the generated `src/integrations/supabase/types.ts`. Why: one source of truth.
 - Access: catalog tables are publicly readable; all catalog writes and every `product-images` storage operation require `public.has_role(auth.uid(), 'admin')` (roles live in `public.user_roles`). Bucket is private, so storefront display of uploaded images must use server-issued signed URLs. Why: closes open write/delete access flagged by the security scan.
+- Order quantities: bundle-count limits and input correction live in `src/features/catalog/lib/bundles.ts`; line totals come only from `bundleSummary` in `lib/pricing.ts` (bundle price × bundles). Why: one tested place for quantity and total rules, reused by the cart later.
+- Product route throws `notFound()` from its loader for missing/malformed ids and returns a small DTO for `head()`; the page reads the full product from the query cache. Why: real 404 + per-product metadata without duplicating data.
