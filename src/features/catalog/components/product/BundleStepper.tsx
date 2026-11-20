@@ -9,7 +9,15 @@ import { clampBundles, correctBundlesInput, MAX_BUNDLES, MIN_BUNDLES } from "../
 const BLOCKED_KEYS = new Set(["e", "E", "+", "-", ".", ","]);
 
 /** − / number / + for whole bundles in [1, 99]; invalid typing is corrected with an inline hint. */
-export function BundleStepper({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+export function BundleStepper({
+  value,
+  onChange,
+  label = "Number of bundles",
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  label?: string;
+}) {
   const inputId = useId();
   const hintId = useId();
   const [draft, setDraft] = useState(String(value));
@@ -37,7 +45,7 @@ export function BundleStepper({ value, onChange }: { value: number; onChange: (n
   return (
     <div className="space-y-1.5">
       <label htmlFor={inputId} className="text-sm font-medium text-foreground">
-        Number of bundles
+        {label}
       </label>
       <div className="flex items-center gap-2">
         <Button
