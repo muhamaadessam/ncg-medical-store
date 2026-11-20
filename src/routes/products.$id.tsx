@@ -1,9 +1,19 @@
 import { useEffect } from "react";
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { createFileRoute, notFound, useRouter, type ErrorComponentProps } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  notFound,
+  useRouter,
+  type ErrorComponentProps,
+} from "@tanstack/react-router";
 
 import { productQueryOptions } from "@/features/catalog";
-import { ProductPage, ProductPageError, ProductPageLoading, ProductPageNotFound } from "@/pages/ProductPage";
+import {
+  ProductPage,
+  ProductPageError,
+  ProductPageLoading,
+  ProductPageNotFound,
+} from "@/pages/ProductPage";
 
 const FALLBACK_DESCRIPTION = "Product details, bundle offers and prices in KWD.";
 
@@ -19,7 +29,9 @@ export const Route = createFileRoute("/products/$id")({
     };
   },
   head: ({ loaderData }) => {
-    const title = loaderData ? `${loaderData.name} — NCG Pharmacy` : "Product unavailable — NCG Pharmacy";
+    const title = loaderData
+      ? `${loaderData.name} — NCG Pharmacy`
+      : "Product unavailable — NCG Pharmacy";
     const description = loaderData?.description?.slice(0, 160) || FALLBACK_DESCRIPTION;
     const image = loaderData?.image?.startsWith("https://") ? loaderData.image : null;
     return {

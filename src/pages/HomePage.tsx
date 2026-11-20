@@ -37,7 +37,11 @@ export function HomePage({ search }: { search: CatalogSearch }) {
       key: "category" as const,
       title: "Categories",
       allCount: counts.allCategories,
-      options: categories.map((c) => ({ id: c.id, name: c.name, count: counts.categories[c.id] ?? 0 })),
+      options: categories.map((c) => ({
+        id: c.id,
+        name: c.name,
+        count: counts.categories[c.id] ?? 0,
+      })),
     },
   ];
 

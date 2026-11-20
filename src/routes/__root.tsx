@@ -84,7 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "NCG Pharmacy" },
-      { name: "description", content: "Medical supplies, first aid and supplements, priced in KWD." },
+      {
+        name: "description",
+        content: "Medical supplies, first aid and supplements, priced in KWD.",
+      },
       { property: "og:title", content: "NCG Pharmacy" },
       {
         property: "og:description",

@@ -1,5 +1,5 @@
 /**
- * Admin feature (placeholder). Product / brand / category / pricing-tier
- * management and image uploads to the "product-images" bucket will live here.
+ * Admin feature: brand, category, product and pricing-tier management.
+ * Writes go through server functions in admin.functions.ts (validated with schemas.ts).
  */
-export const PRODUCT_IMAGES_BUCKET = "product-images";
+export * from "./schemas";
