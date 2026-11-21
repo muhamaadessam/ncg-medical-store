@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useFieldArray, useForm, type FieldErrors, type Resolver } from "react-hook-form";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -7,6 +8,7 @@ import {
   ArrowUp,
   ImageOff,
   ImagePlus,
+  Link2,
   Plus,
   Save,
   Trash2,
@@ -21,10 +23,11 @@ import { packsLabel } from "@/features/catalog/lib/pricing";
 import { formatKWD, toFils } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { ProductWithRelations } from "@/types";
+import { toast } from "sonner";
 
-import { saveProduct } from "../admin.functions";
+import { saveProduct, uploadProductImage } from "../admin.functions";
 import { productInputSchema, type ProductInput } from "../schemas";
-import { useAdminMutation } from "../useAdminMutation";
+import { errorMessage, useAdminMutation } from "../useAdminMutation";
 
 type FormValues = {
   name: string;
@@ -144,6 +147,23 @@ export function ProductForm({ product }: { product?: ProductWithRelations | unde
   const tiers = useFieldArray({ control, name: "tiers" });
   const watchedTiers = watch("tiers");
   const watchedImages = watch("images");
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  const upload = useMutation({
+    mutationFn: (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      return uploadProductImage({ data: form });
+    },
+    onSuccess: ({ url }) => {
+      // Fill the first empty row, or add a new one.
+      const emptyIndex = watchedImages.findIndex((i) => !i.url.trim());
+      if (emptyIndex >= 0) images.update(emptyIndex, { url });
+      else images.append({ url });
+      toast.success("Image uploaded");
+    },
+    onError: (error) => toast.error(errorMessage(error)),
+  });
 
   const save = useAdminMutation((payload: ProductInput) => saveProduct({ data: payload }), {
     success: (_r, payload) => (product ? `Saved “${payload.name}”` : `Created “${payload.name}”`),
@@ -230,7 +250,7 @@ export function ProductForm({ product }: { product?: ProductWithRelations | unde
         <div>
           <h2 className="font-display text-lg font-semibold">Images</h2>
           <p className="text-sm text-muted-foreground">
-            Paste image links (https://…). The first one is the main image.
+            Upload images or paste image links. The first one is the main image.
           </p>
         </div>
         <ul className="space-y-3">
@@ -271,16 +291,41 @@ export function ProductForm({ product }: { product?: ProductWithRelations | unde
             );
           })}
         </ul>
-        <Button
-          type="button"
-          variant="outline"
-          className="rounded-xl"
-          onClick={() => images.append({ url: "" })}
-          disabled={images.fields.length >= 8}
-        >
-          <ImagePlus />
-          Add image
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) upload.mutate(file);
+            }}
+          />
+          <Button
+            type="button"
+            className="rounded-xl"
+            onClick={() => fileInput.current?.click()}
+            disabled={upload.isPending || watchedImages.filter((i) => i.url.trim()).length >= 8}
+          >
+            <ImagePlus />
+            {upload.isPending ? "Uploading…" : "Upload image"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-xl"
+            onClick={() => images.append({ url: "" })}
+            disabled={images.fields.length >= 8}
+          >
+            <Link2 />
+            Add image link
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">JPG, PNG or WebP, up to 3 MB each.</p>
       </section>
 
       {/* Pricing tiers */}

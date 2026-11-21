@@ -13,7 +13,7 @@ Technical assessment for **National Care Group** (Vibe Coder task).
 | **Home** `/` | Product grid with images, brand and category badges, and **every pricing option** per product. Filter by brand and/or category (with counts). Filters live in the URL, so they survive a refresh and can be shared. Pick an offer and add it to the cart straight from the card. |
 | **Product details** `/products/:id` | Gallery, brand, category, description, all offers as selectable cards (per-pack price + "Best value"), a 1–99 bundle stepper and a live total (`2 × 4 Packs · 8 packs · 39.000 KWD`). |
 | **Cart** `/cart` | One line per offer with the offer name, bundle price, bundle stepper, internal pack count and line total. Shows total bundles, total packs and subtotal. Lines can be updated or removed, and totals are recalculated instantly. |
-| **Admin** `/admin` | Create, edit and delete products (name, description, images, brand, category) with **any number of pricing tiers** (label, units per bundle, bundle price, order). Manage brands and categories too. Changes are saved to Postgres and appear on the storefront immediately. |
+| **Admin** `/admin` | Create, edit and delete products (name, description, uploaded or linked images, brand, category) with **any number of pricing tiers** (label, units per bundle, bundle price, order). Manage brands and categories too. Changes are saved to Postgres and appear on the storefront immediately. |
 
 Every page has loading, error and empty states and is responsive (360px → desktop).
 
@@ -88,6 +88,8 @@ Authentication is out of scope, so the admin needs no login. Even so, the browse
 
 - RLS allows **public read** of the catalog only.
 - Every admin write is a TanStack Start **server function** (`src/features/admin/admin.functions.ts`). It validates the input with the same zod schemas the forms use (`src/features/admin/schemas.ts`) and then writes with the server-side service-role client. The key never reaches the browser.
+- A product and its pricing tiers are saved **in one transaction** by the Postgres function `save_product_with_tiers` (executable by the service role only). Removed tiers are deleted, kept tiers are updated in place (their ids stay the same, so carts pick up new prices), and new tiers are inserted. Bundle sizes can even be swapped between tiers without breaking the `UNIQUE (product_id, units_per_bundle)` rule.
+- Image uploads (JPG/PNG/WebP, ≤ 3 MB) go through a server function into the private `product-images` storage bucket.
 
 ## Project structure
 
@@ -156,6 +158,5 @@ CI (`.github/workflows/ci.yml`) runs lint, type check, tests and build on every 
 ## Known limitations
 
 - **No authentication** (out of scope): anyone with the link can use `/admin`. Writes are still server-side and validated.
-- **Product images are URLs.** The `product-images` storage bucket is private, so admin image upload was left out and images are added as links (with live previews).
-- **Saving a product and its tiers is several sequential writes**, not one database transaction. The order is designed so constraints never trip, and a new product is rolled back if its tiers fail. A Postgres function would make it fully atomic.
+- **Uploaded images use long-lived signed URLs.** The `product-images` bucket is private (the workspace doesn't allow public buckets), so an upload stores a 10-year signed link. Image links from other sites can be pasted too.
 - **The cart is per browser** (`localStorage`). Checkout, payment, orders, delivery and inventory are out of scope.

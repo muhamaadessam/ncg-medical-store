@@ -1,12 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import {
-  productInputSchema,
-  taxonomyKindSchema,
-  taxonomyNameSchema,
-  type ProductData,
-} from "./schemas";
+import { productInputSchema, taxonomyKindSchema, taxonomyNameSchema } from "./schemas";
 
 /**
  * Admin write operations.
@@ -30,6 +25,8 @@ async function db() {
 const LABEL: Record<"brands" | "categories", string> = { brands: "brand", categories: "category" };
 
 function fail(error: PgError, fallback: string): never {
+  // RAISE EXCEPTION from save_product_with_tiers carries a user-facing message.
+  if (error?.code === "P0001" && error.message) throw new Error(error.message);
   if (error?.code === "23505") throw new Error("That name is already used. Pick a different one.");
   if (error?.code === "23503")
     throw new Error("It is still used by other records, so it can't be deleted.");
@@ -94,110 +91,73 @@ export const deleteTaxonomy = createServerFn({ method: "POST" })
 
 // ---------------------------------------------------------------- products & pricing tiers
 
-/** Large temporary bundle sizes used while two tiers swap sizes, so UNIQUE(product_id, units) never trips. */
-const TEMP_UNITS_BASE = 1_000_000;
-
-async function saveTiers(
-  client: Awaited<ReturnType<typeof db>>,
-  productId: string,
-  product: ProductData,
-) {
-  const { data: existing, error } = await client
-    .from("pricing_tiers")
-    .select("id, units_per_bundle")
-    .eq("product_id", productId);
-  if (error) fail(error, "Couldn't load the existing pricing tiers.");
-
-  const existingIds = new Set((existing ?? []).map((t) => t.id));
-  const kept = product.tiers
-    .map((tier, index) => ({ ...tier, sort_order: index }))
-    .filter((t) => t.id && existingIds.has(t.id));
-  const keptIds = new Set(kept.map((t) => t.id));
-  const added = product.tiers
-    .map((tier, index) => ({ ...tier, sort_order: index }))
-    .filter((t) => !t.id || !existingIds.has(t.id));
-  const removedIds = (existing ?? []).filter((t) => !keptIds.has(t.id)).map((t) => t.id);
-
-  // 1. Delete removed tiers (frees their bundle sizes).
-  if (removedIds.length > 0) {
-    const { error: delError } = await client.from("pricing_tiers").delete().in("id", removedIds);
-    if (delError) fail(delError, "Couldn't delete the removed pricing tiers.");
-  }
-
-  // 2. Kept tiers whose size changes move to a temporary size first, then 3. get their final values.
-  //    Updating in place keeps tier ids stable, so carts holding them pick up new prices.
-  const units = new Map((existing ?? []).map((t) => [t.id, t.units_per_bundle]));
-  const resized = kept.filter((t) => units.get(t.id!) !== t.units_per_bundle);
-  for (const [i, tier] of resized.entries()) {
-    const { error: tmpError } = await client
-      .from("pricing_tiers")
-      .update({ units_per_bundle: TEMP_UNITS_BASE + i })
-      .eq("id", tier.id!);
-    if (tmpError) fail(tmpError, "Couldn't update the pricing tiers.");
-  }
-  for (const tier of kept) {
-    const { error: updError } = await client
-      .from("pricing_tiers")
-      .update({
-        label: tier.label,
-        units_per_bundle: tier.units_per_bundle,
-        bundle_price: Number(tier.bundle_price),
-        sort_order: tier.sort_order,
-      })
-      .eq("id", tier.id!);
-    if (updError) fail(updError, "Couldn't update the pricing tiers.");
-  }
-
-  // 4. Insert new tiers.
-  if (added.length > 0) {
-    const { error: insError } = await client.from("pricing_tiers").insert(
-      added.map((t) => ({
-        product_id: productId,
-        label: t.label,
-        units_per_bundle: t.units_per_bundle,
-        bundle_price: Number(t.bundle_price),
-        sort_order: t.sort_order,
-      })),
-    );
-    if (insError) fail(insError, "Couldn't add the new pricing tiers.");
-  }
-}
-
 export const saveProduct = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => productInputSchema.parse(input))
   .handler(async ({ data }) => {
     const client = await db();
-    const fields = {
-      name: data.name,
-      description: data.description || null,
-      brand_id: data.brand_id,
-      category_id: data.category_id,
-      images: data.images,
-    };
+    // One Postgres function saves the product and its tiers in a single transaction:
+    // removed tiers are deleted, kept tiers are updated in place (ids stay stable, so carts
+    // pick up new prices) and new tiers are inserted. Execute is granted to service_role only.
+    const { data: id, error } = await client.rpc("save_product_with_tiers", {
+      p_product: {
+        id: data.id ?? null,
+        name: data.name,
+        description: data.description,
+        brand_id: data.brand_id,
+        category_id: data.category_id,
+        images: data.images,
+      },
+      p_tiers: data.tiers.map((tier, index) => ({
+        id: tier.id ?? null,
+        label: tier.label,
+        units_per_bundle: tier.units_per_bundle,
+        // Sent as the validated decimal string so numeric(10,3) gets the exact value.
+        bundle_price: tier.bundle_price,
+        sort_order: index,
+      })),
+    });
+    if (error) fail(error, data.id ? "Couldn't save the product." : "Couldn't create the product.");
+    return { id: id as string };
+  });
 
-    if (data.id) {
-      const { data: row, error } = await client
-        .from("products")
-        .update(fields)
-        .eq("id", data.id)
-        .select("id")
-        .maybeSingle();
-      if (error) fail(error, "Couldn't save the product.");
-      if (!row) throw new Error("This product no longer exists.");
-      await saveTiers(client, data.id, data);
-      return { id: data.id };
-    }
+// ---------------------------------------------------------------- product images
 
-    const { data: row, error } = await client.from("products").insert(fields).select("id").single();
-    if (error || !row) fail(error, "Couldn't create the product.");
-    try {
-      await saveTiers(client, row.id, data);
-    } catch (tierError) {
-      // Don't leave a product without offers behind.
-      await client.from("products").delete().eq("id", row.id);
-      throw tierError;
+const IMAGE_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+/** The bucket is private; uploaded images are served through long-lived signed URLs (10 years). */
+const SIGNED_URL_SECONDS = 10 * 365 * 24 * 60 * 60;
+
+export const uploadProductImage = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => {
+    if (!(input instanceof FormData)) throw new Error("Expected an image file.");
+    const file = input.get("file");
+    if (!(file instanceof File)) throw new Error("Choose an image file.");
+    if (!IMAGE_TYPES[file.type]) throw new Error("Use a JPG, PNG or WebP image.");
+    if (file.size > MAX_IMAGE_BYTES) throw new Error("Images must be 3 MB or smaller.");
+    return file;
+  })
+  .handler(async ({ data: file }) => {
+    const client = await db();
+    const path = `products/${crypto.randomUUID()}.${IMAGE_TYPES[file.type]}`;
+    const { error } = await client.storage
+      .from("product-images")
+      .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
+    if (error) {
+      console.error("[admin] upload", error);
+      throw new Error("Couldn't upload the image. Please try again.");
     }
-    return { id: row.id };
+    const { data: signed, error: signError } = await client.storage
+      .from("product-images")
+      .createSignedUrl(path, SIGNED_URL_SECONDS);
+    if (signError || !signed) {
+      console.error("[admin] sign", signError);
+      throw new Error("The image was uploaded but its link couldn't be created.");
+    }
+    return { url: signed.signedUrl };
   });
 
 export const deleteProduct = createServerFn({ method: "POST" })
