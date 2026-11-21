@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ClearFiltersButton } from "./CatalogFilters";
 
 export const PRODUCT_GRID_CLASS =
-  "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4";
+  "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3";
 
 export function ProductCardSkeleton() {
   return (
