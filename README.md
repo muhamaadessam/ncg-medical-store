@@ -71,9 +71,15 @@ Relevant code: `src/lib/money.ts`, `src/features/cart/cartMath.ts`, `src/feature
 
 ## AI tools used
 
-- **Lovable:** initial build (database schema, seed data, money helpers, home page, product details page)
-- **Claude (Anthropic):** planning, writing the Lovable prompts, and code review
-- **Claude Code:** cart, admin panel, server functions, tests, CI and documentation (pushed to this repo, which syncs both ways with Lovable)
+The Git history shows who wrote what: `gpt-engineer-app[bot]` / `Lovable` commits come from Lovable, and `Claude` commits come from Claude.
+
+| Tool | What it built | Commits |
+| --- | --- | --- |
+| **Lovable** (AI app builder) | Project template, database schema + seed data + RLS, KWD money helpers, data hooks, app shell, **Home page** (filters, tier cards), **Product details page**, security lock-down of browser writes, and the `save_product_with_tiers` Postgres function + storage rules | 11 commits, Nov 16–21 |
+| **Claude Code** (Anthropic, Claude Opus) | **Cart** (logic, store, page), **Admin panel** (products, pricing tiers, brands, categories, image upload, server functions), tests for cart and admin validation, GitHub Actions CI, README | 6 commits, Nov 20–21 |
+| **Claude** (claude.ai chat) | Analysis of the brief, the step-by-step Lovable prompts and checklists, review of Lovable's code and commits | — |
+
+Every step was reviewed and tested by me: the preview after each change, the manual checklist below, and the automated tests in CI.
 
 ## Database
 
