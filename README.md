@@ -1,5 +1,7 @@
 # NCG Pharmacy — Medical e-commerce with multi-tier bundle pricing
 
+[![CI](https://github.com/muhamaadessam/ncg-medical-store/actions/workflows/ci.yml/badge.svg)](https://github.com/muhamaadessam/ncg-medical-store/actions/workflows/ci.yml)
+
 Technical assessment for **National Care Group** (Vibe Coder task).
 
 - **Live app:** https://ncg-medical-store.lovable.app
