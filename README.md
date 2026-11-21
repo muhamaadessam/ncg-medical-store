@@ -6,6 +6,16 @@ Technical assessment for **National Care Group** (Vibe Coder task).
 - **Admin panel:** https://ncg-medical-store.lovable.app/admin (open to anyone: authentication is out of scope)
 - **Repository:** https://github.com/muhamaadessam/ncg-medical-store
 
+**Deliverables at a glance**
+
+| Required by the brief | Where |
+| --- | --- |
+| Live link with admin access | links above |
+| Source code | this repository |
+| How to run + project structure | [Local setup](#local-setup), [Project structure](#project-structure) |
+| AI tools and technologies used | [AI tools used](#ai-tools-used), [Tech stack](#tech-stack) |
+| Known limitations | [Known limitations](#known-limitations) |
+
 ## Features
 
 | Page | What it does |
@@ -31,6 +41,27 @@ The brief's rules, and how the code enforces them:
 6. **Valid quantities only.** Bundles are whole numbers from 1 to 99. Typing 0, negatives, decimals, text or > 99 is corrected with an inline hint, and the cart store rejects invalid values.
 
 Relevant code: `src/lib/money.ts`, `src/features/cart/cartMath.ts`, `src/features/catalog/lib/pricing.ts`, `src/features/catalog/lib/bundles.ts`.
+
+## Using the admin panel
+
+1. Open `/admin`. No login is needed.
+2. **Brands** / **Categories** tabs: add, rename or delete. A brand or category that products still use can't be deleted, and the app says how many products use it.
+3. **Products** tab → **New product** (or the pencil icon to edit):
+   - name, description, brand, category
+   - images: **Upload image** (JPG/PNG/WebP, ≤ 3 MB) or **Add image link**. The first image is the main one.
+   - **Pricing tiers**: add as many as needed. Each tier has a label (e.g. `4 Packs`), units per bundle (`4`) and the **total** bundle price in KWD (`19.500`). Use the arrows to reorder and the bin icon to remove. A per-pack hint shows under each tier.
+4. **Save**. The storefront, product page and cart update immediately.
+
+## Key decisions
+
+| Decision | Why |
+| --- | --- |
+| Cart lines keyed by `tierId` | Different offers of the same product must stay separate lines; this makes it automatic. |
+| Money as integer fils | KWD has 3 decimals. Float math gives results like `39.000000001`, while integer fils are always exact. |
+| Cart keeps no prices | Prices always come from the database, so admin changes can't leave a stale price in a cart. |
+| Admin writes through server functions | No login is required (out of scope), yet the browser still can't write to the database directly. Input is validated on both sides with the same zod schemas. |
+| One Postgres function saves a product and its tiers | Saving is all-or-nothing, and tier ids stay stable when a tier is edited. |
+| Filters in the URL | A refresh or a shared link keeps the filtered view. |
 
 ## Tech stack
 
@@ -90,6 +121,7 @@ Authentication is out of scope, so the admin needs no login. Even so, the browse
 - Every admin write is a TanStack Start **server function** (`src/features/admin/admin.functions.ts`). It validates the input with the same zod schemas the forms use (`src/features/admin/schemas.ts`) and then writes with the server-side service-role client. The key never reaches the browser.
 - A product and its pricing tiers are saved **in one transaction** by the Postgres function `save_product_with_tiers` (executable by the service role only). Removed tiers are deleted, kept tiers are updated in place (their ids stay the same, so carts pick up new prices), and new tiers are inserted. Bundle sizes can even be swapped between tiers without breaking the `UNIQUE (product_id, units_per_bundle)` rule.
 - Image uploads (JPG/PNG/WebP, ≤ 3 MB) go through a server function into the private `product-images` storage bucket.
+- Lovable's security scan reports a warning that the four catalog tables let everyone through. This is intended: it refers to the **read** policies, because a public storefront must show products to visitors without logging in. No table accepts writes from the browser.
 
 ## Project structure
 
@@ -110,7 +142,7 @@ drizzle/migrations/       SQL schema, RLS policies and seed data
 
 ## Local setup
 
-Requires **Bun** (or Node 20+ with npm).
+Requires **Bun** (or Node 20+ with npm) and works on Windows, macOS and Linux.
 
 ```bash
 git clone https://github.com/muhamaadessam/ncg-medical-store.git
@@ -134,7 +166,7 @@ bun run lint
 bun run build
 ```
 
-CI (`.github/workflows/ci.yml`) runs lint, type check, tests and build on every push.
+CI (`.github/workflows/ci.yml`) runs lint, type check, tests and build on every push. Results are in the repository's **Actions** tab.
 
 **Automated tests (65)** cover:
 
